@@ -297,7 +297,8 @@ const GooglePlacesAutocomplete = React.createClass({
       request.open('POST', `https://orders.sanship.vn/api/v2.0/order/place-detail`)
       request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       request.send(JSON.stringify({
-        placeid: rowData.place_id
+        placeid: rowData.place_id,
+        memberToken: this.props.query.token
       }));
     } else if (rowData.isCurrentLocation === true) {
 
@@ -463,7 +464,8 @@ const GooglePlacesAutocomplete = React.createClass({
       request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       // request.open('GET', 'https://maps.googleapis.com/maps/api/place/autocomplete/json?&input=' + encodeURIComponent(text) + '&' + Qs.stringify(this.props.query));
       request.send(JSON.stringify({
-        input: text
+        input: text,
+        memberToken: this.props.query.token
       }));
     } else {
       this._results = [];
