@@ -288,7 +288,6 @@ const GooglePlacesAutocomplete = React.createClass({
           console.warn('google places autocomplete: request could not be completed or has been aborted');
         }
       };
-      console.log(this.props.query.key, rowData.place_id, this.props.query.language);
       // request.open('GET', 'https://maps.googleapis.com/maps/api/place/details/json?' + Qs.stringify({
       //   key: this.props.query.key,
       //   placeid: rowData.place_id,
@@ -434,9 +433,7 @@ const GooglePlacesAutocomplete = React.createClass({
 
   _request(text) {
     this._abortRequests();
-    console.log('hihii',text.length);
     if (text.length===0 || text.length >= this.props.minLength) {
-      console.log('hiii',text.length);
       const request = new XMLHttpRequest();
       this._requests.push(request);
       request.timeout = this.props.timeout;
@@ -453,7 +450,6 @@ const GooglePlacesAutocomplete = React.createClass({
               this.setState({
                 dataSource: this.state.dataSource.cloneWithRows(this.buildRowsFromResults(responseJSON.predictions)),
               });
-              console.log('hihi',this.state.dataSource);
             }
           }
           if (typeof responseJSON.error_message !== 'undefined') {
@@ -570,25 +566,10 @@ const GooglePlacesAutocomplete = React.createClass({
       listViewDisplayed: true,
       text:""
     });
-    console.log('minn',this.state.text.length);
   },
 
   _getListView() {
-    if (this.state.text ==='') {
-      return (
-        <ListView
-          keyboardShouldPersistTaps={true}
-          keyboardDismissMode="on-drag"
-          style={[defaultStyles.listView, this.props.styles.listView]}
-          dataSource={this.state.dataSource}
-          renderSeparator={this._renderSeparator}
-          automaticallyAdjustContentInsets={false}
-          {...this.props}
-          renderRow={this._renderRow}
-        />
-      );
-    }
-    if (( this.props.predefinedPlaces.length || this.props.currentLocation === true) && this.state.listViewDisplayed === true) {
+    if (this.state.listViewDisplayed) {
       return (
         <ListView
           keyboardShouldPersistTaps={true}
