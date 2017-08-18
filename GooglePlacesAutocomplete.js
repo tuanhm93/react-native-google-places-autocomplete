@@ -288,7 +288,6 @@ const GooglePlacesAutocomplete = React.createClass({
           console.warn('google places autocomplete: request could not be completed or has been aborted');
         }
       };
-      console.log(this.props.query.key, rowData.place_id, this.props.query.language);
       // request.open('GET', 'https://maps.googleapis.com/maps/api/place/details/json?' + Qs.stringify({
       //   key: this.props.query.key,
       //   placeid: rowData.place_id,
@@ -434,7 +433,7 @@ const GooglePlacesAutocomplete = React.createClass({
 
   _request(text) {
     this._abortRequests();
-    if (text.length >= this.props.minLength) {
+    if (text.length===0 || text.length >= this.props.minLength) {
       const request = new XMLHttpRequest();
       this._requests.push(request);
       request.timeout = this.props.timeout;
@@ -562,11 +561,15 @@ const GooglePlacesAutocomplete = React.createClass({
   },
 
   _onFocus() {
-    this.setState({listViewDisplayed: true});
+    this._request("");
+    this.setState({
+      listViewDisplayed: true,
+      text:""
+    });
   },
 
   _getListView() {
-    if ((this.state.text !== '' || this.props.predefinedPlaces.length || this.props.currentLocation === true) && this.state.listViewDisplayed === true) {
+    if (this.state.listViewDisplayed) {
       return (
         <ListView
           keyboardShouldPersistTaps={true}
