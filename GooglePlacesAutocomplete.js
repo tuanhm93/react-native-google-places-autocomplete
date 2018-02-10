@@ -88,6 +88,8 @@ const GooglePlacesAutocomplete = React.createClass({
     enableEmptySections: React.PropTypes.bool,
     renderDescription: React.PropTypes.func,
     renderRow: React.PropTypes.func,
+    timeoutShowListView: React.PropTypes.number,
+    limitTextSearch: React.PropTypes.number,
   },
 
   getDefaultProps() {
@@ -123,7 +125,9 @@ const GooglePlacesAutocomplete = React.createClass({
       filterReverseGeocodingByTypes: [],
       predefinedPlacesAlwaysVisible: false,
       enableEmptySections: true,
-      listViewDisplayed: 'auto'
+      listViewDisplayed: 'auto',
+      timeoutShowListView: 0,
+      limitTextSearch: 0,
     };
   },
 
@@ -138,6 +142,7 @@ const GooglePlacesAutocomplete = React.createClass({
       text: this.props.getDefaultValue(),
       dataSource: ds.cloneWithRows(this.buildRowsFromResults([])),
       listViewDisplayed: this.props.listViewDisplayed === 'auto' ? false : this.props.listViewDisplayed,
+      isTextInputChange: false
     };
   },
 
@@ -177,7 +182,9 @@ const GooglePlacesAutocomplete = React.createClass({
       });
     }
   },
-
+  componentWillMount() {
+      this.timer = null;
+  },
   componentWillUnmount() {
     this._abortRequests();
   },
@@ -474,11 +481,24 @@ const GooglePlacesAutocomplete = React.createClass({
     }
   },
   _onChangeText(text) {
-    this._request(text);
+
+    clearTimeout(this.timer);
+
     this.setState({
-      text: text,
-      listViewDisplayed: true,
+      text:text,
+      listViewDisplayed: false,
     });
+
+    this.timer = setTimeout(() => {
+      this.refs.textInput.value = this.state.text;
+      if(text.length > this.props.limitTextSearch ) {
+        this._request(text);
+        this.setState({
+          listViewDisplayed: true,
+        });
+      }
+    },this.props.timeoutShowListView);
+
   },
 
   _getRowLoader() {
@@ -602,6 +622,7 @@ const GooglePlacesAutocomplete = React.createClass({
   },
   render() {
     let { onChangeText, onFocus, ...userProps } = this.props.textInputProps;
+
     return (
       <View
         style={[defaultStyles.container, this.props.styles.container]}
@@ -614,7 +635,9 @@ const GooglePlacesAutocomplete = React.createClass({
             ref="textInput"
             autoFocus={this.props.autoFocus}
             style={[defaultStyles.textInput, this.props.styles.textInput]}
-            onChangeText={onChangeText ? text => {this._onChangeText(text); onChangeText(text)} : this._onChangeText}
+            onChangeText={onChangeText ?
+              text => {this.setState({isTextInputChange: true});this._onChangeText(text); onChangeText(text)}
+              : text => {this.setState({isTextInputChange: true});this._onChangeText(text);}}
             value={this.state.text}
             placeholder={this.props.placeholder}
             placeholderTextColor={this.props.placeholderTextColor}
