@@ -88,6 +88,8 @@ const GooglePlacesAutocomplete = React.createClass({
     enableEmptySections: React.PropTypes.bool,
     renderDescription: React.PropTypes.func,
     renderRow: React.PropTypes.func,
+    timeoutShowListView: React.PropTypes.number,
+    limitTextSearch: React.PropTypes.number,
   },
 
   getDefaultProps() {
@@ -123,7 +125,9 @@ const GooglePlacesAutocomplete = React.createClass({
       filterReverseGeocodingByTypes: [],
       predefinedPlacesAlwaysVisible: false,
       enableEmptySections: true,
-      listViewDisplayed: 'auto'
+      listViewDisplayed: 'auto',
+      timeoutShowListView: 0,
+      limitTextSearch: 0,
     };
   },
 
@@ -177,7 +181,9 @@ const GooglePlacesAutocomplete = React.createClass({
       });
     }
   },
-
+  componentWillMount() {
+      this.timer = null;
+  },
   componentWillUnmount() {
     this._abortRequests();
   },
@@ -474,11 +480,22 @@ const GooglePlacesAutocomplete = React.createClass({
     }
   },
   _onChangeText(text) {
-    this._request(text);
+
+    clearTimeout(this.timer);
+
     this.setState({
-      text: text,
-      listViewDisplayed: true,
+      text:text,
+      listViewDisplayed: false,
     });
+    if(text.length > this.props.limitTextSearch ) {
+      this.setState({
+        listViewDisplayed: true,
+      });
+      this.timer = setTimeout(() => {
+        this.refs.textInput.value = this.state.text;
+        this._request(text);
+      },this.props.timeoutShowListView);
+    }
   },
 
   _getRowLoader() {
