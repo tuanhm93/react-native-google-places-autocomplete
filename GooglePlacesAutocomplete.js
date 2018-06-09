@@ -470,7 +470,8 @@ const GooglePlacesAutocomplete = React.createClass({
       // request.open('GET', 'https://maps.googleapis.com/maps/api/place/autocomplete/json?&input=' + encodeURIComponent(text) + '&' + Qs.stringify(this.props.query));
       request.send(JSON.stringify({
         input: text,
-        memberToken: this.props.query.token
+        memberToken: this.props.query.token,
+        region: this.props.query.region
       }));
     } else {
       this._results = [];
