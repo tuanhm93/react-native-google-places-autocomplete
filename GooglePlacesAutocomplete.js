@@ -278,6 +278,7 @@ const GooglePlacesAutocomplete = React.createClass({
               this._onBlur();
 
               let terms = rowData.terms || []
+              details.formatted_address = this.textFinal;
               this.setState({
                 text: terms[0] ? terms[0].value : "Unnamed Road",
               });
@@ -300,6 +301,7 @@ const GooglePlacesAutocomplete = React.createClass({
       //   language: this.props.query.language,
       // }));
       request.open('POST', `https://orders.sanship.vn/api/v2.0/order/place-detail`)
+      this.textFinal = rowData.description;
       request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       request.send(JSON.stringify({
         placeid: rowData.place_id,
@@ -488,7 +490,7 @@ const GooglePlacesAutocomplete = React.createClass({
       text:text,
       listViewDisplayed: false,
     });
-    if(text.length > this.props.limitTextSearch ) {
+    if(!text.length || text.length > this.props.limitTextSearch ) {
       this.setState({
         listViewDisplayed: true,
       });
