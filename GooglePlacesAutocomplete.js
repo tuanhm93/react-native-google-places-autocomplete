@@ -500,7 +500,7 @@ const GooglePlacesAutocomplete = React.createClass({
     if(currentTextState.trim() !== text.trim()) {
       clearTimeout(this.timer);
 
-      if(!text.length || text.length > this.props.limitTextSearch ) {
+      if(text.length > this.props.limitTextSearch) {
         this.setState({
           listViewDisplayed: true,
           loadingListView: true
