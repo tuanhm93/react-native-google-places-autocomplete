@@ -490,22 +490,27 @@ const GooglePlacesAutocomplete = React.createClass({
     }
   },
   _onChangeText(text) {
-
-    clearTimeout(this.timer);
+    const currentTextState = this.state.text;
 
     this.setState({
       text:text,
-      listViewDisplayed: false,
+      listViewDisplayed: currentTextState.trim() === text.trim()
     });
-    if(!text.length || text.length > this.props.limitTextSearch ) {
-      this.setState({
-        listViewDisplayed: true,
-        loadingListView: true
-      });
-      this.timer = setTimeout(() => {
-        this.refs.textInput.value = this.state.text;
-        this._request(text);
-      },this.props.timeoutShowListView);
+
+    if(currentTextState.trim() !== text.trim()) {
+      clearTimeout(this.timer);
+
+      if(!text.length || text.length > this.props.limitTextSearch ) {
+        this.setState({
+          listViewDisplayed: true,
+          loadingListView: true
+        });
+
+        this.timer = setTimeout(() => {
+          this.refs.textInput.value = this.state.text;
+          this._request(text);
+        },this.props.timeoutShowListView);
+      }
     }
   },
 
