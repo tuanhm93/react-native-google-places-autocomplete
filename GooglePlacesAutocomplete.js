@@ -301,7 +301,7 @@ const GooglePlacesAutocomplete = React.createClass({
       //   placeid: rowData.place_id,
       //   language: this.props.query.language,
       // }));
-      request.open('POST', `https://orders.sanship.vn/api/v2.0/order/place-detail`)
+      request.open('POST', `${this.props.serverUrl}/api/v2.0/order/place-detail`)
       this.textFinal = rowData.description;
       request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       request.send(JSON.stringify({
@@ -474,7 +474,7 @@ const GooglePlacesAutocomplete = React.createClass({
           // console.warn("google places autocomplete: request could not be completed or has been aborted");
         }
       };
-      request.open('POST', `https://orders.sanship.vn/api/v2.0/order/place-autocomplete`)
+      request.open('POST', `${this.props.serverUrl}/api/v2.0/order/place-autocomplete`)
       request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       // request.open('GET', 'https://maps.googleapis.com/maps/api/place/autocomplete/json?&input=' + encodeURIComponent(text) + '&' + Qs.stringify(this.props.query));
       request.send(JSON.stringify({
