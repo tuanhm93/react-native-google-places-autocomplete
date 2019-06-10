@@ -186,6 +186,7 @@ const GooglePlacesAutocomplete = React.createClass({
       this.timer = null;
   },
   componentWillUnmount() {
+    clearTimeout(this.timer);
     this._abortRequests();
   },
 
