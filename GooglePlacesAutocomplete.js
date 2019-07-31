@@ -186,6 +186,8 @@ const GooglePlacesAutocomplete = React.createClass({
       this.timer = null;
   },
   componentWillUnmount() {
+    clearTimeout(this.timer);
+
     this._abortRequests();
   },
 
@@ -296,18 +298,23 @@ const GooglePlacesAutocomplete = React.createClass({
           console.warn('google places autocomplete: request could not be completed or has been aborted');
         }
       };
-      // request.open('GET', 'https://maps.googleapis.com/maps/api/place/details/json?' + Qs.stringify({
-      //   key: this.props.query.key,
-      //   placeid: rowData.place_id,
-      //   language: this.props.query.language,
-      // }));
-      request.open('POST', `${this.props.serverUrl}/api/v2.0/order/place-detail`)
-      this.textFinal = rowData.description;
-      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      request.send(JSON.stringify({
-        placeid: rowData.place_id,
-        memberToken: this.props.query.token
-      }));
+      if (_.get(this.props.query, 'key', '')) {
+        request.open('GET', 'https://maps.googleapis.com/maps/api/place/details/json?' + Qs.stringify({
+          key: this.props.query.key,
+          placeid: rowData.place_id,
+          language: this.props.query.language
+        }));
+        this.textFinal = rowData.description;
+        request.send();
+      } else {
+        request.open('POST', `${this.props.serverUrl}/api/v2.0/order/place-detail`)
+        this.textFinal = rowData.description;
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        request.send(JSON.stringify({
+          placeid: rowData.place_id,
+          memberToken: this.props.query.token
+        }));
+      }
     } else if (rowData.isCurrentLocation === true) {
 
       // display loader
@@ -474,14 +481,19 @@ const GooglePlacesAutocomplete = React.createClass({
           // console.warn("google places autocomplete: request could not be completed or has been aborted");
         }
       };
-      request.open('POST', `${this.props.serverUrl}/api/v2.0/order/place-autocomplete`)
-      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      // request.open('GET', 'https://maps.googleapis.com/maps/api/place/autocomplete/json?&input=' + encodeURIComponent(text) + '&' + Qs.stringify(this.props.query));
-      request.send(JSON.stringify({
-        input: text,
-        memberToken: this.props.query.token,
-        region: this.props.query.region
-      }));
+
+      if (_.get(this.props.query, 'key', '')) {
+        request.open('GET', 'https://maps.googleapis.com/maps/api/place/autocomplete/json?&input=' + encodeURIComponent(text) + '&' + Qs.stringify(this.props.query))
+        request.send();
+      } else {
+        request.open('POST', `${this.props.serverUrl}/api/v2.0/order/place-autocomplete`);
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        request.send(JSON.stringify({
+          input: text,
+          memberToken: this.props.query.token,
+          region: this.props.query.region
+        }));
+      }
     } else {
       this._results = [];
       this.setState({
